@@ -8,14 +8,17 @@
 
 ---
 
-## ディレクトリ構造（未定 — 技術スタック確定後に更新）
+## ディレクトリ構造
 
 ```
 /
 ├── AGENTS.md              # エージェントへのマップ
 ├── ARCHITECTURE.md        # このファイル
 ├── docs/                  # ナレッジベース（記録システム）
-└── src/                   # アプリケーションコード（技術スタック確定後に構造を定義）
+└── src/
+    ├── scraper/           # Blogspotスクレイピング・ジオコーディング
+    ├── api/               # FastAPI（REST API・スケジューラ）
+    └── frontend/          # 生HTML + Vanilla JS + Leaflet.js
 ```
 
 ---
@@ -62,25 +65,24 @@ types → config → repository → service → api/runtime → ui
 
 ---
 
-## ビジネスドメイン（未定 — プロダクト定義後に更新）
+## ビジネスドメイン
 
-> プロダクトの方向性が決まったら、各ビジネスドメインをここに定義してください。
-> 例:
-> - `auth` — 認証・セッション管理
-> - `user` — ユーザープロファイル管理
-> - `billing` — 課金・サブスクリプション
+- `tournaments` — 大会情報の管理・APIへの公開
+- `scraper` — 外部サイトからのデータ収集・ジオコーディング
 
 ---
 
-## 技術スタック（未定）
+## 技術スタック
 
-> 技術スタックが確定したら以下を更新してください。
->
-> | 領域 | 技術 |
-> |---|---|
-> | フロントエンド | TBD |
-> | バックエンド | TBD |
-> | データベース | TBD |
-> | インフラ | TBD |
-> | CI/CD | TBD |
-> | 監視 | TBD |
+| 領域 | 技術 |
+|---|---|
+| フロントエンド | 生HTML + Vanilla JS + Leaflet.js |
+| バックエンド | Python / FastAPI |
+| スクレイピング | requests + BeautifulSoup4 |
+| ジオコーディング | Nominatim (OpenStreetMap) |
+| データベース | SQLite |
+| スケジューラ | APScheduler |
+| ホスティング（フロント） | Vercel ※暫定 |
+| ホスティング（バックエンド） | Render または Fly.io ※暫定 |
+
+> 技術選定の理由は [`docs/design-docs/tech-stack.md`](./docs/design-docs/tech-stack.md) を参照。

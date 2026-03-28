@@ -23,6 +23,7 @@
 | ドキュメント | ステータス | 概要 |
 |---|---|---|
 | [`core-beliefs.md`](./core-beliefs.md) | ✅ Active | エージェントファーストの中核的信念 |
+| [`tech-stack.md`](./tech-stack.md) | ✅ Active | 技術スタック選定の理由 |
 
 > 新しい設計判断を追加したらここに記載してください。
 
