@@ -3,7 +3,7 @@
 ## 目標
 
 Blogspotの将棋大会スケジュールサイトから首都圏の大会情報を自動取得し、
-緯度経度付きでSQLiteに保存するパイプラインを構築する。
+SQLiteに保存するパイプラインを構築する。
 
 ## 背景・動機
 
@@ -14,9 +14,8 @@ Blogspotの将棋大会スケジュールサイトから首都圏の大会情報
 
 1. 対象ページのHTMLを `requests` で取得、`BeautifulSoup4` でパース
 2. 都道府県情報を判定し、首都圏（東京・神奈川・埼玉・千葉）のみ抽出
-3. 会場名を `Nominatim` でジオコーディング → lat/lng取得
-4. 結果をSQLiteに保存（ジオコーディング結果をキャッシュ）
-5. `APScheduler` で定期実行（頻度は週1〜日1で要検討）
+3. 結果をSQLiteに保存
+4. `APScheduler` で定期実行（頻度は週1〜日1で要検討）
 
 ## タスク
 
@@ -26,22 +25,18 @@ Blogspotの将棋大会スケジュールサイトから首都圏の大会情報
 - [x] Blogspotページ構造の解析・パーサー実装
 - [x] 首都圏フィルタリングロジック実装（都道府県判定）
 - [x] SQLiteスキーマ設計・マイグレーション実装
-  - テーブル: `tournaments`（id, date, name, venue, prefecture, lat, lng, category, source_url）
-  - テーブル: `geocode_cache`（venue_name, lat, lng, updated_at）
-- [x] Nominatimジオコーディング実装（キャッシュ参照 → APIコール → キャッシュ保存）
+  - テーブル: `tournaments`（id, date, name, venue, prefecture, category, source_url）
 - [x] スクレイピング失敗時のアラート機構（ログ出力 + 構造変化の検出）
 - [x] APSchedulerによる定期実行設定
 - [x] ローカルでの動作確認（実データで取得・保存が正常に動くこと）
 
 ## 意思決定ログ
 
-- Nominatimはレートリミット（1 req/sec）があるため、`geocode_cache` テーブルで初回以降はAPIコールをスキップする
-- 会場名のジオコーディング精度が低いケースは `geocode_cache` に手動補正フィールドを設けて対応する
 - Seleniumは不要（対象サイトは静的HTML）
 - ページの大会データは `JSON.parse('...')` として静的HTMLに埋め込まれている。BeautifulSoupによるDOM解析は不要で、正規表現でJSON文字列を抽出してパースする方式を採用した（構造変化検知のため `#event_lists` 要素の存在チェックは残す）
+- 地図表示はコロプレス図（市区町村ポリゴン塗り分け）で行うため、lat/lngは不要と判断。Nominatimジオコーディングと `geocode_cache` テーブルを削除した。`venue`（市区町村レベル）をキーにGeoJSONと突き合わせる方式はフロントエンドフェーズで実装する
 
 ## 完了条件
 
 - 首都圏の大会データがSQLiteに保存されていること
-- 各レコードに lat/lng が付与されていること（取得失敗分は NULL 許容）
 - 定期実行が設定され、2回以上の自動取得が正常に動作すること

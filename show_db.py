@@ -20,10 +20,7 @@ def show(conn: sqlite3.Connection) -> None:
 
     # tournaments
     total, = conn.execute("SELECT COUNT(*) FROM tournaments").fetchone()
-    with_coords, = conn.execute(
-        "SELECT COUNT(*) FROM tournaments WHERE lat IS NOT NULL"
-    ).fetchone()
-    print(f"=== tournaments  ({total} rows, {with_coords} with lat/lng) ===")
+    print(f"=== tournaments  ({total} rows) ===")
 
     print("\n--- prefecture breakdown ---")
     for row in conn.execute(
@@ -33,23 +30,10 @@ def show(conn: sqlite3.Connection) -> None:
 
     print("\n--- sample (10 rows) ---")
     for row in conn.execute(
-        "SELECT date, prefecture, name, venue, lat, lng FROM tournaments ORDER BY date LIMIT 10"
+        "SELECT date, prefecture, name, venue FROM tournaments ORDER BY date LIMIT 10"
     ):
-        coords = f"({row['lat']:.4f}, {row['lng']:.4f})" if row["lat"] else "no coords"
-        print(f"  {row['date']} [{row['prefecture']}] {row['name']} / {row['venue']} {coords}")
+        print(f"  {row['date']} [{row['prefecture']}] {row['name']} / {row['venue']}")
 
-    # geocode_cache
-    cache_total, = conn.execute("SELECT COUNT(*) FROM geocode_cache").fetchone()
-    manual, = conn.execute(
-        "SELECT COUNT(*) FROM geocode_cache WHERE manually_corrected = 1"
-    ).fetchone()
-    print(f"\n=== geocode_cache  ({cache_total} rows, {manual} manually corrected) ===")
-    for row in conn.execute(
-        "SELECT venue_name, lat, lng, manually_corrected, updated_at FROM geocode_cache ORDER BY updated_at DESC LIMIT 10"
-    ):
-        flag = " [manual]" if row["manually_corrected"] else ""
-        coords = f"({row['lat']:.4f}, {row['lng']:.4f})" if row["lat"] else "no coords"
-        print(f"  {row['venue_name']} {coords}{flag}  updated={row['updated_at']}")
 
 
 if __name__ == "__main__":

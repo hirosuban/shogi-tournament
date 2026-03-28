@@ -1,11 +1,10 @@
 import logging
 import sqlite3
 from contextlib import contextmanager
-from datetime import datetime
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator
 
-from .types import GeocodeEntry, Tournament
+from .types import Tournament
 
 logger = logging.getLogger(__name__)
 
@@ -40,19 +39,9 @@ def migrate(db_path: Path) -> None:
                 name        TEXT    NOT NULL,
                 venue       TEXT    NOT NULL,
                 prefecture  TEXT    NOT NULL,
-                lat         REAL,
-                lng         REAL,
                 category    TEXT    NOT NULL,
                 source_url  TEXT    NOT NULL,
                 UNIQUE (date, name, venue)
-            );
-
-            CREATE TABLE IF NOT EXISTS geocode_cache (
-                venue_name          TEXT    PRIMARY KEY,
-                lat                 REAL,
-                lng                 REAL,
-                manually_corrected  INTEGER NOT NULL DEFAULT 0,
-                updated_at          TEXT    NOT NULL
             );
         """)
     conn.close()
@@ -68,16 +57,14 @@ def upsert_tournaments(db_path: Path, tournaments: list[Tournament]) -> int:
             cur = conn.execute(
                 """
                 INSERT OR IGNORE INTO tournaments
-                    (date, name, venue, prefecture, lat, lng, category, source_url)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    (date, name, venue, prefecture, category, source_url)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
                     t.date.isoformat(),
                     t.name,
                     t.venue,
                     t.prefecture,
-                    t.lat,
-                    t.lng,
                     ",".join(t.categories),
                     t.source_url,
                 ),
@@ -85,46 +72,3 @@ def upsert_tournaments(db_path: Path, tournaments: list[Tournament]) -> int:
             count += cur.rowcount
     conn.close()
     return count
-
-
-def get_geocode_cache(
-    db_path: Path, venue_name: str
-) -> Optional[GeocodeEntry]:
-    conn = _connect(db_path)
-    row = conn.execute(
-        "SELECT * FROM geocode_cache WHERE venue_name = ?", (venue_name,)
-    ).fetchone()
-    conn.close()
-    if row is None:
-        return None
-    return GeocodeEntry(
-        venue_name=row["venue_name"],
-        lat=row["lat"],
-        lng=row["lng"],
-        manually_corrected=bool(row["manually_corrected"]),
-    )
-
-
-def upsert_geocode_cache(db_path: Path, entry: GeocodeEntry) -> None:
-    conn = _connect(db_path)
-    with _transaction(conn):
-        conn.execute(
-            """
-            INSERT INTO geocode_cache (venue_name, lat, lng, manually_corrected, updated_at)
-            VALUES (?, ?, ?, ?, ?)
-            ON CONFLICT(venue_name) DO UPDATE SET
-                lat                = excluded.lat,
-                lng                = excluded.lng,
-                manually_corrected = excluded.manually_corrected,
-                updated_at         = excluded.updated_at
-            WHERE manually_corrected = 0
-            """,
-            (
-                entry.venue_name,
-                entry.lat,
-                entry.lng,
-                int(entry.manually_corrected),
-                datetime.utcnow().isoformat(),
-            ),
-        )
-    conn.close()

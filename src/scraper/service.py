@@ -1,7 +1,6 @@
 import logging
 
 from .config import Config
-from .geocoder import attach_coordinates
 from .parser import filter_kanto, scrape
 from .repository import migrate, upsert_tournaments
 
@@ -9,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def run_pipeline(config: Config) -> None:
-    """Full pipeline: scrape → filter → geocode → save."""
+    """Full pipeline: scrape → filter → save."""
     migrate(config.db_path)
 
     try:
@@ -25,11 +24,9 @@ def run_pipeline(config: Config) -> None:
     if not kanto:
         logger.warning("No Kanto tournaments found — possible data issue")
 
-    with_coords = attach_coordinates(kanto, config)
-
-    inserted = upsert_tournaments(config.db_path, with_coords)
+    inserted = upsert_tournaments(config.db_path, kanto)
     logger.info(
         "Pipeline complete: %d new records inserted (total processed: %d)",
         inserted,
-        len(with_coords),
+        len(kanto),
     )
