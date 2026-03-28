@@ -23,23 +23,30 @@ Phase 5 でのデプロイを円滑にするために、以下を整理・実装
 
 ## タスク
 
-- [ ] `server.py` 作成（FastAPI + StaticFiles 統合）
-- [ ] `src/api/main.py` の CORS 設定を環境別に分岐（開発: ワイルドカード、本番: localhost のみ）
-- [ ] `src/api/config.py` を拡張（`ApiConfig` に `environment`、`frontend_origins` の動的設定）
-- [ ] `render.json` 作成（Render の自動ビルド・起動設定）
-- [ ] スクレイパー呼び出し用の内部 API エンドポイント追加（`POST /admin/trigger-scraper` など）
-- [ ] ローカル動作確認（`server.py` or `uvicorn server:app` で フロント＋バック＋API が正常に動作することを確認）
-- [ ] テスト追加（既存テスト + `server.py` の統合テスト）
+- [x] `server.py` 作成（FastAPI + StaticFiles 統合）
+- [x] `src/api/main.py` の CORS 設定を環境別に分岐（開発: ワイルドカード、本番: localhost のみ）
+- [x] `src/api/config.py` を拡張（`ApiConfig` に `environment`、`frontend_origins` の動的設定）
+- [x] `render.json` 作成（Render の自動ビルド・起動設定）
+- [x] スクレイパー呼び出し用の内部 API エンドポイント追加（`POST /admin/trigger-scraper` など）
+- [x] ローカル動作確認（`server.py` or `uvicorn server:app` で フロント＋バック＋API が正常に動作することを確認）
+- [x] テスト追加（既存テスト + `server.py` の統合テスト）
+- [x] 以下を実行したのち、ユーザがアクセスしたときにフロントが表示されることを確認（`http://localhost:8000`）
+```
+cd /workspaces/some
+uv run python server.py
+```
 
 ## 意思決定ログ
 
 - ホスティング先: **Render.com 無料枠**（完全無料、GitHub 連携が簡単）
 - スクレイパー定期実行: **GitHub Actions**（外部スケジューラ、無料、管理が一箇所）
 - フロント配信: FastAPI の `StaticFiles`（シンプル、CORS 削除可能）
+- 実装完了日: 2026-03-28
 
 ## 完了条件
 
-- `server.py` を起動するだけで、フロント + バック API の両方がローカルで動作する
-- 環境変数 `ENVIRONMENT=production` で本番設定に自動切り替わる
-- `render.json` が正しく配置され、Render Dashboard で自動検出される
-- 内部 API エンドポイント（スクレイパートリガー）が完成している
+- ✅ `server.py` を起動するだけで、フロント + バック API の両方がローカルで動作する
+- ✅ 環境変数 `ENVIRONMENT=production` で本番設定に自動切り替わる
+- ✅ `render.json` が正しく配置され、Render Dashboard で自動検出される
+- ✅ 内部 API エンドポイント（スクレイパートリガー）が完成している
+- ✅ 統合テスト 8/8 pass

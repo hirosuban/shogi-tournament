@@ -1,4 +1,3 @@
-const API_BASE_URL = "http://localhost:8000";
 const GEOJSON_PATH = "./data/shutoken.geojson";
 
 const state = {
@@ -139,7 +138,7 @@ async function fetchAndRenderTournaments() {
 
     try {
         const params = buildQueryParams();
-        const url = `${API_BASE_URL}/tournaments${params.toString() ? `?${params}` : ""}`;
+        const url = `/tournaments${params.toString() ? `?${params}` : ""}`;
         const response = await fetch(url);
 
         if (!response.ok) {

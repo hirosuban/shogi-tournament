@@ -15,13 +15,27 @@ def create_app(config: ApiConfig | None = None) -> FastAPI:
 
     app = FastAPI(title="Shogi Tournaments API", version="0.1.0")
 
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=list(settings.frontend_origins),
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    # CORS 設定（環境別）
+    if settings.environment == "development":
+        # 開発環境: localhost のすべてのポートを許可
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=list(settings.frontend_origins),
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+    elif settings.frontend_origins:
+        # 本番環境かつ明示的にオリジンが指定されている場合のみ CORS 追加
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=list(settings.frontend_origins),
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+    # 本番環境で FRONTEND_ORIGINS が指定されていない場合は CORS ミドルウェアを追加しない
+    # （フロント + バック が同一オリジンで動作するため）
 
     @app.get("/tournaments", response_model=list[TournamentSummary])
     def get_tournaments(
@@ -44,6 +58,28 @@ def create_app(config: ApiConfig | None = None) -> FastAPI:
         if tournament is None:
             raise HTTPException(status_code=404, detail="Tournament not found")
         return tournament
+
+    @app.post("/admin/trigger-scraper")
+    def trigger_scraper(token: str | None = None) -> dict[str, str]:
+        """
+        スクレイパーを手動トリガー（GitHub Actions や外部スケジューラからの呼び出し用）.
+        本番環境では ADMIN_TOKEN による認証が必須.
+        """
+        if settings.environment == "production":
+            if not token or token != settings.admin_token:
+                raise HTTPException(
+                    status_code=403, detail="Invalid or missing admin token"
+                )
+
+        # スクレイパーロジックを実行
+        try:
+            from ..scraper.service import run_pipeline
+            from ..scraper.config import CONFIG
+
+            run_pipeline(config=CONFIG)
+            return {"status": "success", "message": "Scraper triggered successfully"}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Scraper error: {str(e)}")
 
     return app
 
