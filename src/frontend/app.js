@@ -1,8 +1,10 @@
 const GEOJSON_PATH = "./data/shutoken.geojson";
+const TOURNAMENTS_PATH = "./data/tournaments.json";
 
 const state = {
     selectedPrefectures: new Set(),
     mapLayersByPrefecture: new Map(),
+    tournaments: null,
 };
 
 const refs = {
@@ -50,24 +52,6 @@ function updateSelectedPrefectureText() {
     refs.selectedPrefectures.textContent = names.length
         ? names.join(" / ")
         : "未選択（全件表示）";
-}
-
-function buildQueryParams() {
-    const params = new URLSearchParams();
-
-    for (const prefecture of state.selectedPrefectures) {
-        params.append("prefecture", prefecture);
-    }
-
-    if (refs.fromDate.value) {
-        params.append("from", refs.fromDate.value);
-    }
-
-    if (refs.toDate.value) {
-        params.append("to", refs.toDate.value);
-    }
-
-    return params;
 }
 
 function renderEmpty() {
@@ -132,28 +116,35 @@ function renderTournaments(tournaments) {
     }
 }
 
-async function fetchAndRenderTournaments() {
-    setLoading(true);
-    setError("");
-
-    try {
-        const params = buildQueryParams();
-        const url = `/tournaments${params.toString() ? `?${params}` : ""}`;
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(`大会データの取得に失敗しました: ${response.status}`);
-        }
-
-        const tournaments = await response.json();
-        renderTournaments(tournaments);
-    } catch (error) {
-        refs.resultCount.textContent = "0件";
-        refs.tournamentList.innerHTML = "";
-        setError(error instanceof Error ? error.message : "不明なエラーが発生しました");
-    } finally {
-        setLoading(false);
+async function loadTournaments() {
+    const response = await fetch(TOURNAMENTS_PATH);
+    if (!response.ok) {
+        throw new Error(`大会データの取得に失敗しました: ${response.status}`);
     }
+    state.tournaments = await response.json();
+}
+
+function filterAndRenderTournaments() {
+    if (!state.tournaments) {
+        renderEmpty();
+        return;
+    }
+
+    let filtered = state.tournaments;
+
+    if (state.selectedPrefectures.size > 0) {
+        filtered = filtered.filter((t) => state.selectedPrefectures.has(t.prefecture));
+    }
+
+    if (refs.fromDate.value) {
+        filtered = filtered.filter((t) => t.date >= refs.fromDate.value);
+    }
+
+    if (refs.toDate.value) {
+        filtered = filtered.filter((t) => t.date <= refs.toDate.value);
+    }
+
+    renderTournaments(filtered);
 }
 
 function syncMapStyles() {
@@ -170,7 +161,7 @@ function onPrefectureClick(prefecture) {
     }
     syncMapStyles();
     updateSelectedPrefectureText();
-    fetchAndRenderTournaments();
+    filterAndRenderTournaments();
 }
 
 async function loadGeoJson() {
@@ -209,12 +200,12 @@ function resetFilters() {
     state.selectedPrefectures.clear();
     syncMapStyles();
     updateSelectedPrefectureText();
-    fetchAndRenderTournaments();
+    filterAndRenderTournaments();
 }
 
 function attachEvents() {
-    refs.fromDate.addEventListener("change", fetchAndRenderTournaments);
-    refs.toDate.addEventListener("change", fetchAndRenderTournaments);
+    refs.fromDate.addEventListener("change", filterAndRenderTournaments);
+    refs.toDate.addEventListener("change", filterAndRenderTournaments);
     refs.resetButton.addEventListener("click", resetFilters);
 }
 
@@ -228,7 +219,15 @@ async function init() {
         setError(error instanceof Error ? error.message : "地図の初期化に失敗しました");
     }
 
-    fetchAndRenderTournaments();
+    setLoading(true);
+    try {
+        await loadTournaments();
+        filterAndRenderTournaments();
+    } catch (error) {
+        setError(error instanceof Error ? error.message : "不明なエラーが発生しました");
+    } finally {
+        setLoading(false);
+    }
 }
 
 void init();

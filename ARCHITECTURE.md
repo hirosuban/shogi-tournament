@@ -17,9 +17,8 @@
 ├── ARCHITECTURE.md        # このファイル
 ├── docs/                  # ナレッジベース（記録システム）
 └── src/
-    ├── scraper/           # Blogspotスクレイピング・ジオコーディング
-    ├── api/               # FastAPI（REST API・スケジューラ）
-    └── frontend/          # 生HTML + Vanilla JS + Leaflet.js
+    ├── scraper/           # Blogspotスクレイピング → JSON出力
+    └── frontend/          # 生HTML + Vanilla JS + Leaflet.js（静的サイト）
 ```
 
 ---
@@ -30,17 +29,15 @@
 依存関係は **前方方向のみ** 許可されます（後戻り禁止）。
 
 ```
-types → config → repository → service → api/runtime → ui
+types → config → service → ui
 ```
 
 | レイヤー | 役割 |
 |---|---|
 | `types` | データ形状の定義。外部依存なし |
 | `config` | 設定値の読み込み・バリデーション |
-| `repository` | データアクセス（DB・外部API） |
-| `service` | ビジネスロジック |
-| `api/runtime` | エントリポイント・ルーティング |
-| `ui` | プレゼンテーション層 |
+| `service` | ビジネスロジック（スクレイピング・JSON出力） |
+| `ui` | プレゼンテーション層（静的HTML/JS） |
 
 ---
 
@@ -68,8 +65,8 @@ types → config → repository → service → api/runtime → ui
 
 ## ビジネスドメイン
 
-- `tournaments` — 大会情報の管理・APIへの公開
-- `scraper` — 外部サイトからのデータ収集・ジオコーディング
+- `scraper` — 外部サイトからのデータ収集 → 静的JSON出力
+- `frontend` — 静的サイトとして大会情報を地図付きで表示
 
 ---
 
@@ -80,12 +77,9 @@ types → config → repository → service → api/runtime → ui
 | 開発環境 | devcontainer |
 | 依存管理 | uv |
 | フロントエンド | 生HTML + Vanilla JS + Leaflet.js |
-| バックエンド | Python / FastAPI |
 | スクレイピング | requests + BeautifulSoup4 |
-| ジオコーディング | Nominatim (OpenStreetMap) |
-| データベース | SQLite |
-| スケジューラ | APScheduler |
-| ホスティング（フロント） | Vercel ※暫定 |
-| ホスティング（バックエンド） | Render または Fly.io ※暫定 |
+| データ形式 | 静的JSON（スクレイパーが生成 → フロントエンドが読み込み） |
+| ホスティング | Render Static Site |
+| スケジューラ | GitHub Actions（日次cron） |
 
 > 技術選定の理由は [`docs/design-docs/tech-stack.md`](./docs/design-docs/tech-stack.md) を参照。

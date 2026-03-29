@@ -4,16 +4,13 @@ from pathlib import Path
 
 @dataclass(frozen=True)
 class Config:
-    source_url: str = (
-        "https://sho-shogi.blogspot.com/p/blog-page_20.html?m=1"
+    source_url: str = "https://sho-shogi.blogspot.com/p/blog-page_20.html?m=1"
+    output_path: Path = field(
+        default_factory=lambda: Path("src/frontend/data/tournaments.json")
     )
-    db_path: Path = field(default_factory=lambda: Path("data/shogi.db"))
     kanto_prefectures: frozenset[str] = field(
-        default_factory=lambda: frozenset(
-            ["東京都", "神奈川県", "埼玉県", "千葉県"]
-        )
+        default_factory=lambda: frozenset(["東京都", "神奈川県", "埼玉県", "千葉県"])
     )
-    schedule_interval_hours: int = 24
 
 
 CONFIG = Config()
