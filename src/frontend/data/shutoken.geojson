@@ -1,0 +1,141 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "東京都",
+                "code": "tokyo"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            139.0,
+                            35.53
+                        ],
+                        [
+                            139.0,
+                            35.93
+                        ],
+                        [
+                            139.95,
+                            35.93
+                        ],
+                        [
+                            139.95,
+                            35.53
+                        ],
+                        [
+                            139.0,
+                            35.53
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "神奈川県",
+                "code": "kanagawa"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            139.05,
+                            35.14
+                        ],
+                        [
+                            139.05,
+                            35.7
+                        ],
+                        [
+                            139.86,
+                            35.7
+                        ],
+                        [
+                            139.86,
+                            35.14
+                        ],
+                        [
+                            139.05,
+                            35.14
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "埼玉県",
+                "code": "saitama"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            138.71,
+                            35.75
+                        ],
+                        [
+                            138.71,
+                            36.35
+                        ],
+                        [
+                            139.95,
+                            36.35
+                        ],
+                        [
+                            139.95,
+                            35.75
+                        ],
+                        [
+                            138.71,
+                            35.75
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "千葉県",
+                "code": "chiba"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            139.65,
+                            35.2
+                        ],
+                        [
+                            139.65,
+                            36.1
+                        ],
+                        [
+                            140.9,
+                            36.1
+                        ],
+                        [
+                            140.9,
+                            35.2
+                        ],
+                        [
+                            139.65,
+                            35.2
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}

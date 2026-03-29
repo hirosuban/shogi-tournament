@@ -25,7 +25,7 @@ htmlcov/
 .ruff_cache/
 
 # Runtime data
-/src/frontend/data/shutoken.geojson
+
 
 # OS
 .DS_Store
