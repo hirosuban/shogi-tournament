@@ -36,16 +36,17 @@ Phase 4 のコード整理が完了し、デプロイ準備が整った。
   - Environment: `ENVIRONMENT=production` が設定されていることを確認
   - デプロイが完了し、本番 URL（`https://xxxx.onrender.com`）が発行されることを確認
 
-- [ ] **Render の Auto Deploy を確認**
+- [x] **Render の Auto Deploy を確認**
   - GitHub 連携済みサービスで Auto Deploy を ON にする
   - main ブランチ更新時に自動デプロイされることを確認
 
-- [ ] **GitHub Secrets に登録**
+- [　] **GitHub Secrets に登録**
   - リポジトリの Settings → Secrets and variables → Actions → "New repository secret"
   - （この方式では必須 secret なし）
   - 任意: `RENDER_DEPLOY_HOOK_URL`（Auto Deploy を使わない場合のみ）
+  - 不要なのでやっていません。（ユーザメモ）
 
-- [ ] **エージェントに以下を共有する**（作業開始時に伝える）
+- [x] **エージェントに以下を共有する**（作業開始時に伝える）
   - 本番 URL（`https://xxxx.onrender.com`）
 
 ### Phase B: エージェントが実行すること（Phase A 完了後）
