@@ -55,7 +55,9 @@ active/ → (完了後) → completed/
 
 ## アクティブプラン
 
-現在アクティブな実行プランはありません。
+| プラン | 概要 |
+|---|---|
+| [`phase6-static-site`](./exec-plans/active/phase6-static-site.md) | 完全静的化（Render Web Service → Static Site） |
 
 ---
 
